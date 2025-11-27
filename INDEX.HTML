@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Background Remover App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(to right, #4a00e0, #8e2de2);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .app-body {
+            display: flex;
+            flex-direction: column;
+            padding: 30px;
+        }
+        
+        .upload-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .upload-area {
+            width: 100%;
+            max-width: 500px;
+            height: 250px;
+            border: 3px dashed #8e2de2;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+            background-color: #f8f9fa;
+        }
+        
+        .upload-area:hover {
+            background-color: #e9ecef;
+            transform: translateY(-5px);
+        }
+        
+        .upload-icon {
+            font-size: 60px;
+            color: #8e2de2;
+            margin-bottom: 15px;
+        }
+        
+        .upload-text {
+            font-size: 1.2rem;
+            color: #495057;
+            text-align: center;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, #4a00e0, #8e2de2);
+            color: white;
+            box-shadow: 0 5px 15px rgba(142, 45, 226, 0.4);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(142, 45, 226, 0.6);
+        }
+        
+        .btn-secondary {
+            background-color: #e9ecef;
+            color: #495057;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #dee2e6;
+        }
+        
+        .options-section {
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+            color: #343a40;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .background-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .option-card {
+            flex: 1;
+            min-width: 150px;
+            background-color: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .option-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .option-card.active {
+            border-color: #8e2de2;
+            background-color: #f0e6ff;
+        }
+        
+        .option-icon {
+            font-size: 30px;
+            margin-bottom: 10px;
+        }
+        
+        .color-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 3px solid transparent;
+        }
+        
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+        
+        .color-option.active {
+            border-color: #343a40;
+            transform: scale(1.1);
+        }
+        
+        .preview-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .preview-container {
+            width: 100%;
+            max-width: 500px;
+            height: 300px;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            position: relative;
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .preview-image {
+            max-width: 100%;
+            max-height: 100%;
+            display: none;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .placeholder-text {
+            color: #6c757d;
+            font-size: 1.1rem;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .loading {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #8e2de2;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #f8f9fa;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .background-options {
+                flex-direction: column;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Background Remover</h1>
+            <p class="subtitle">Remove image backgrounds instantly with custom background options</p>
+        </header>
+        
+        <div class="app-body">
+            <div class="upload-section">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📁</div>
+                    <p class="upload-text">Drag & Drop your image here<br>or click to browse</p>
+                </div>
+                <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                <button class="btn btn-primary" id="browseBtn">
+                    <span>Browse Files</span>
+                </button>
+            </div>
+            
+            <div class="options-section">
+                <h2 class="section-title">Background Options</h2>
+                
+                <div class="background-options">
+                    <div class="option-card active" id="transparentOption">
+                        <div class="option-icon">🔍</div>
+                        <h3>Transparent</h3>
+                        <p>Remove background</p>
+                    </div>
+                    
+                    <div class="option-card" id="colorOption">
+                        <div class="option-icon">🎨</div>
+                        <h3>Color</h3>
+                        <p>Solid color background</p>
+                    </div>
+                    
+                    <div class="option-card" id="customOption">
+                        <div class="option-icon">🖼️</div>
+                        <h3>Custom</h3>
+                        <p>Your own background</p>
+                    </div>
+                </div>
+                
+                <div id="colorOptions" style="display: none;">
+                    <h3 class="section-title">Choose a Color</h3>
+                    <div class="color-options">
+                        <div class="color-option active" style="background-color: #ffffff;" data-color="#ffffff"></div>
+                        <div class="color-option" style="background-color: #000000;" data-color="#000000"></div>
+                        <div class="color-option" style="background-color: #ff3b30;" data-color="#ff3b30"></div>
+                        <div class="color-option" style="background-color: #4cd964;" data-color="#4cd964"></div>
+                        <div class="color-option" style="background-color: #007aff;" data-color="#007aff"></div>
+                        <div class="color-option" style="background-color: #5856d6;" data-color="#5856d6"></div>
+                        <div class="color-option" style="background-color: #ffcc00;" data-color="#ffcc00"></div>
+                        <div class="color-option" style="background-color: #ff9500;" data-color="#ff9500"></div>
+                    </div>
+                </div>
+                
+                <div id="customBackgroundOptions" style="display: none;">
+                    <h3 class="section-title">Upload Custom Background</h3>
+                    <div class="upload-area" id="customBgUploadArea" style="height: 150px;">
+                        <div class="upload-icon">🌄</div>
+                        <p class="upload-text">Drag & Drop background image<br>or click to browse</p>
+                    </div>
+                    <input type="file" id="customBgInput" accept="image/*" style="display: none;">
+                </div>
+            </div>
+            
+            <div class="preview-section">
+                <h2 class="section-title">Preview</h2>
+                <div class="preview-container" id="previewContainer">
+                    <p class="placeholder-text">Your processed image will appear here</p>
+                    <img class="preview-image" id="previewImage" src="" alt="Processed Image">
+                    <div class="loading" id="loadingIndicator">
+                        <div class="spinner"></div>
+                        <p>Processing image...</p>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="processBtn" disabled>
+                        <span>Remove Background</span>
+                    </button>
+                    <button class="btn btn-secondary" id="downloadBtn" disabled>
+                        <span>Download Image</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Background Remover App &copy; 2023 | Powered by Remove.bg API</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('fileInput');
+            const browseBtn = document.getElementById('browseBtn');
+            const processBtn = document.getElementById('processBtn');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const previewImage = document.getElementById('previewImage');
+            const previewContainer = document.getElementById('previewContainer');
+            const placeholderText = document.querySelector('.placeholder-text');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            
+            // Background option elements
+            const transparentOption = document.getElementById('transparentOption');
+            const colorOption = document.getElementById('colorOption');
+            const customOption = document.getElementById('customOption');
+            const colorOptions = document.getElementById('colorOptions');
+            const customBackgroundOptions = document.getElementById('customBackgroundOptions');
+            const customBgUploadArea = document.getElementById('customBgUploadArea');
+            const customBgInput = document.getElementById('customBgInput');
+            
+            // State variables
+            let selectedImage = null;
+            let selectedBackgroundType = 'transparent';
+            let selectedColor = '#ffffff';
+            let customBackground = null;
+            let processedImage = null;
+            
+            // Remove.bg API configuration
+            const API_KEY = 'bSWbMEC3WnpW446QUw3QjYWx';
+            const API_URL = 'https://api.remove.bg/v1.0/removebg';
+            
+            // Event Listeners
+            browseBtn.addEventListener('click', () => fileInput.click());
+            uploadArea.addEventListener('click', () => fileInput.click());
+            fileInput.addEventListener('change', handleImageUpload);
+            
+            // Background option selection
+            transparentOption.addEventListener('click', () => selectBackgroundOption('transparent'));
+            colorOption.addEventListener('click', () => selectBackgroundOption('color'));
+            customOption.addEventListener('click', () => selectBackgroundOption('custom'));
+            
+            // Color selection
+            document.querySelectorAll('.color-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('.color-option').forEach(opt => opt.classList.remove('active'));
+                    this.classList.add('active');
+                    selectedColor = this.getAttribute('data-color');
+                    if (processedImage && selectedBackgroundType === 'color') {
+                        applyBackgroundToProcessedImage();
+                    }
+                });
+            });
+            
+            // Custom background upload
+            customBgUploadArea.addEventListener('click', () => customBgInput.click());
+            customBgInput.addEventListener('change', handleCustomBackgroundUpload);
+            
+            // Process and download buttons
+            processBtn.addEventListener('click', processImageWithRemoveBg);
+            downloadBtn.addEventListener('click', downloadImage);
+            
+            // Functions
+            function handleImageUpload(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    // Check file size (Remove.bg has a 12MB limit)
+                    if (file.size > 12 * 1024 * 1024) {
+                        alert('File size exceeds 12MB limit. Please choose a smaller image.');
+                        return;
+                    }
+                    
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        selectedImage = event.target.result;
+                        processBtn.disabled = false;
+                        // Show a preview of the uploaded image
+                        previewImage.src = selectedImage;
+                        previewImage.style.display = 'block';
+                        placeholderText.style.display = 'none';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+            
+            function handleCustomBackgroundUpload(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        customBackground = event.target.result;
+                        if (processedImage && selectedBackgroundType === 'custom') {
+                            applyBackgroundToProcessedImage();
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+            
+            function selectBackgroundOption(type) {
+                selectedBackgroundType = type;
+                
+                // Update UI
+                transparentOption.classList.remove('active');
+                colorOption.classList.remove('active');
+                customOption.classList.remove('active');
+                
+                colorOptions.style.display = 'none';
+                customBackgroundOptions.style.display = 'none';
+                
+                if (type === 'transparent') {
+                    transparentOption.classList.add('active');
+                } else if (type === 'color') {
+                    colorOption.classList.add('active');
+                    colorOptions.style.display = 'block';
+                } else if (type === 'custom') {
+                    customOption.classList.add('active');
+                    customBackgroundOptions.style.display = 'block';
+                }
+                
+                if (processedImage) {
+                    applyBackgroundToProcessedImage();
+                }
+            }
+            
+            async function processImageWithRemoveBg() {
+                if (!selectedImage) return;
+                
+                // Show loading indicator
+                loadingIndicator.style.display = 'flex';
+                placeholderText.style.display = 'none';
+                previewImage.style.display = 'none';
+                processBtn.disabled = true;
+                
+                try {
+                    // Convert base64 to blob
+                    const response = await fetch(selectedImage);
+                    const blob = await response.blob();
+                    
+                    // Create form data for API request
+                    const formData = new FormData();
+                    formData.append('image_file', blob);
+                    formData.append('size', 'auto');
+                    
+                    // Make API request to Remove.bg
+                    const apiResponse = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: {
+                            'X-Api-Key': API_KEY,
+                        },
+                        body: formData
+                    });
+                    
+                    if (!apiResponse.ok) {
+                        throw new Error(`API Error: ${apiResponse.status} ${apiResponse.statusText}`);
+                    }
+                    
+                    // Get the processed image as blob
+                    const processedBlob = await apiResponse.blob();
+                    
+                    // Convert blob to base64 for display
+                    const reader = new FileReader();
+                    reader.onload = function() {
+                        processedImage = reader.result;
+                        applyBackgroundToProcessedImage();
+                        loadingIndicator.style.display = 'none';
+                        previewImage.style.display = 'block';
+                        processBtn.disabled = false;
+                        downloadBtn.disabled = false;
+                    };
+                    reader.readAsDataURL(processedBlob);
+                    
+                } catch (error) {
+                    console.error('Error processing image:', error);
+                    alert('Error processing image. Please try again.');
+                    loadingIndicator.style.display = 'none';
+                    previewImage.style.display = 'block';
+                    processBtn.disabled = false;
+                }
+            }
+            
+            function applyBackgroundToProcessedImage() {
+                if (!processedImage) return;
+                
+                // For transparent background, just show the processed image
+                if (selectedBackgroundType === 'transparent') {
+                    previewImage.src = processedImage;
+                    previewContainer.style.background = 'url("data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"40\" height=\"40\" viewBox=\"0 0 40 40\"><rect fill=\"%23f0f0f0\" width=\"20\" height=\"20\"/><rect fill=\"%23d0d0d0\" x=\"20\" y=\"20\" width=\"20\" height=\"20\"/></svg>")';
+                } 
+                // For color background, create a canvas with the colored background
+                else if (selectedBackgroundType === 'color') {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    const img = new Image();
+                    img.onload = function() {
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        
+                        // Fill with selected color
+                        ctx.fillStyle = selectedColor;
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                        
+                        // Draw the processed image on top
+                        ctx.drawImage(img, 0, 0);
+                        
+                        previewImage.src = canvas.toDataURL();
+                        previewContainer.style.background = selectedColor;
+                    };
+                    img.src = processedImage;
+                } 
+                // For custom background, create a canvas with the custom background
+                else if (selectedBackgroundType === 'custom' && customBackground) {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    const bgImg = new Image();
+                    const fgImg = new Image();
+                    
+                    bgImg.onload = function() {
+                        canvas.width = bgImg.width;
+                        canvas.height = bgImg.height;
+                        
+                        // Draw the background
+                        ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
+                        
+                        // Draw the foreground (processed image) on top
+                        fgImg.onload = function() {
+                            ctx.drawImage(fgImg, 0, 0, canvas.width, canvas.height);
+                            previewImage.src = canvas.toDataURL();
+                            previewContainer.style.background = `url(${customBackground}) center/cover`;
+                        };
+                        fgImg.src = processedImage;
+                    };
+                    bgImg.src = customBackground;
+                }
+            }
+            
+            function downloadImage() {
+                if (!previewImage.src) return;
+                
+                // Create a temporary link for download
+                const link = document.createElement('a');
+                link.download = 'background-removed-image.png';
+                link.href = previewImage.src;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+            
+            // Drag and drop functionality
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = '#4a00e0';
+                uploadArea.style.backgroundColor = '#e9ecef';
+            });
+            
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.style.borderColor = '#8e2de2';
+                uploadArea.style.backgroundColor = '#f8f9fa';
+            });
+            
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = '#8e2de2';
+                uploadArea.style.backgroundColor = '#f8f9fa';
+                
+                if (e.dataTransfer.files.length) {
+                    fileInput.files = e.dataTransfer.files;
+                    handleImageUpload({ target: fileInput });
+                }
+            });
+            
+            // Custom background drag and drop
+            customBgUploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                customBgUploadArea.style.borderColor = '#4a00e0';
+                customBgUploadArea.style.backgroundColor = '#e9ecef';
+            });
+            
+            customBgUploadArea.addEventListener('dragleave', () => {
+                customBgUploadArea.style.borderColor = '#8e2de2';
+                customBgUploadArea.style.backgroundColor = '#f8f9fa';
+            });
+            
+            customBgUploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                customBgUploadArea.style.borderColor = '#8e2de2';
+                customBgUploadArea.style.backgroundColor = '#f8f9fa';
+                
+                if (e.dataTransfer.files.length) {
+                    customBgInput.files = e.dataTransfer.files;
+                    handleCustomBackgroundUpload({ target: customBgInput });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
